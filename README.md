@@ -1,5 +1,6 @@
 # Point2Contour
-Abstract
+
+Building Rooftop Contouring from Airborne Laser Scanning Point Clouds.
 
 ## Contents
 
@@ -13,8 +14,8 @@ Abstract
 
 ## Pipeline
 
-[pic]
- 
+![](./Point2Contour_pipeline.png)
+
 ## Requirements
 
 (1) It is recommended to install this model in an isolated Conda environment with Python 3.9:
