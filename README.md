@@ -21,7 +21,7 @@ Building Rooftop Contouring from Airborne Laser Scanning Point Clouds.
 (1) It is recommended to install this model in an isolated Conda environment with Python 3.9:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Sen2Maker/Point2Contour.git
 cd Point2Contour
 
 conda create -n point2contour python=3.9 -y
