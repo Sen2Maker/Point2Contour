@@ -2,7 +2,7 @@
 
 Building Rooftop Contouring from Airborne Laser Scanning Point Clouds.
 
-## Contents
+## Table of Contents
 
 - [Pipeline](#pipeline)
 - [Requirements](#requirements)
