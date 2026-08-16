@@ -1,0 +1,32 @@
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+
+# 虚拟环境
+.venv/
+venv/
+env/
+
+# IDE / 编辑器
+.idea/
+.vscode/
+*.swp
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 训练产物（如果以后有权重、日志，一般不要进 Git）
+*.pth
+*.pt
+*.ckpt
+*.log
+results/*
+!results/.gitkeep

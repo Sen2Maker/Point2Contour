@@ -1,0 +1,11 @@
+conda create -n env python=3.9
+conda activate env
+
+pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cu126
+
+pip install --no-cache-dir \
+  --find-links https://miropsota.github.io/torch_packages_builder/pytorch3d/ \
+  "pytorch3d==0.7.9+pt2.6.0cu126"
+
+pip install -r requirements.txt
+

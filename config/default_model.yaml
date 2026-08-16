@@ -1,0 +1,223 @@
+
+optim:
+  sch_type: stagewise_80
+  base_lr: 0.0005
+
+  beta1: 0.9
+  beta2: 0.999
+  weight_decay: 0.01
+
+  stage_epochs:
+    warmup: 5
+    e1: 45
+    e2: 60
+
+  stage_lrs:
+    start_ratio: 0.1
+    mid_ratio: 0.2
+    refine_ratio: 0.08
+    final_ratio: 0.03
+
+dataset:
+  name: NewDateset
+
+model:
+  type: CornerExt
+  encoder:
+    grid_size: 64
+    N_knn: 8
+    max_pooling: False
+    mlp_abs:
+      size: [3, 64, 128]
+      activation_type: lrelu
+      num_pos_encoding: -1
+    mlp_self:
+      size: [3, 64, 128]
+      activation_type: lrelu
+      num_pos_encoding: -1
+    mlp_block:
+      size: [260, 256, 128]
+      activation_type: lrelu
+    mlp_token:
+      size: [512, 512, 256]
+      activation_type: lrelu
+
+    attn:
+      depth: 2
+      block:
+        head: 4
+        head_dim: 64
+        activation_type: lrelu
+        ffn_ratio: 0.0
+        dropout: 0.2
+      partition:
+        mode: fps
+        B: 512
+        pool: meanmax
+
+
+  edge_decoder:
+    mlp_gate:
+      size: [256, 128, 256]
+      activation_type: lrelu
+    mlp_edge:
+      size: [256, 128, 1]
+      activation_type: lrelu
+
+  joint_decoder:
+    offset_scale: 1.0
+    max_corner_offset: 0.3
+    mlp_center_mul:
+      size: [256, 256, 256 ]
+      activation_type: lrelu
+    mlp_center_add:
+      size: [ 256, 256, 256 ]
+      activation_type: lrelu
+    mlp_gate:
+      size: [ 256, 128, 256 ]
+      activation_type: lrelu
+    decoder2corner:
+      size: [ 256, 128, 64 ,3 ]
+      activation_type: lrelu
+
+    delta_embed:
+      size: [ 3, 64, 256 ]
+      activation_type: lrelu
+      num_pos_encoding: -1
+    corner_delta_fuse:
+      size: [ 768, 256 , 256 ]
+
+    edge_enc:
+      size: [ 3, 64 ,128 ]
+      activation_type: lrelu
+      num_pos_encoding: -1
+    edge_feat_enc:
+      size: [ 256, 128]
+      activation_type: lrelu
+    edge_fuse:
+      size: [ 256, 256, 256 ]
+      activation_type: lrelu
+    ca:
+      depth: 1
+      block:
+        head: 4
+        head_dim: 64
+        activation_type: lrelu
+        ffn_ratio: 2.0
+        dropout: 0.2
+
+    ray_pos_encoder:
+      size: [ 3, 64 ,128, 256]
+      activation_type: lrelu
+      num_pos_encoding: -1
+    sa:
+      depth: 2
+      block:
+        head: 4
+        head_dim: 64
+        activation_type: lrelu
+        ffn_ratio: 0.0
+        dropout: 0.2
+    ray_scale_dim: 256
+    reg_head:
+      size: [ 512,256, 128 , 4 ]
+      activation_type: lrelu
+
+
+  line_refiner:
+    num_nodes: 16
+    top_k: 3
+    tau: 0.05
+    pos_encoder:
+      size: [ 8, 64, 64 ]
+      activation_type: lrelu
+    feat_proj:
+      size: [ 320, 128 , 128 ]
+      activation_type: lrelu
+    conv_in: 128
+    conv_out: 128
+
+    support_head:
+      size: [ 128, 1 ]
+    endpoint_head:
+      size: [ 128, 1 ]
+    line_cls_head1:
+      size: [ 384,128 ]
+    line_cls_head2:
+      size: [ 128,1 ]
+    offset_head1:
+      size: [ 384,128 ]
+    offset_head2:
+      size: [ 128,3 ]
+
+
+
+
+
+
+loss:
+
+
+
+
+  edge:
+    metric: BCE
+    factor: 1.0
+
+  loss_cls:
+    metric: Focal
+    factor: 3.0
+
+  loss_dice:
+    metric: Dice
+    factor: 0.2
+
+  loss_inside:
+    metric: Point2Segment
+    factor: 0.1
+
+  loss_endpoint_ce:
+    metric: CE
+    factor: 0.2
+
+
+
+
+
+  corner_xyz:
+    metric: SmoothL1
+    factor: 2.0
+
+  loss_dir:
+    metric: SmoothL1
+    factor: 1.0
+
+  loss_endpoint:
+    metric: SmoothL1
+    factor: 0.5
+
+  corner2edge:
+    metric: Point2Line
+    factor: 1.0
+
+
+
+
+
+  loss_dist:
+    metric: LogSmoothL1
+    factor: 2.0
+
+  loss_line_refine:
+    metric: BCE
+    factor: 3
+
+  loss_refined_dist:
+    metric: SmoothL1
+    factor: 0.5
+
+  loss_perp_offset:
+    metric: L1
+    factor: 1.0
+  loss_corner_aux:
+    factor: 0.5

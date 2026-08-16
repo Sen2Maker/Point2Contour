@@ -1,0 +1,8 @@
+configargparse
+tensorboard
+trimesh==3.9.29
+dotted
+tqdm
+scipy
+scikit-learn
+pyyaml

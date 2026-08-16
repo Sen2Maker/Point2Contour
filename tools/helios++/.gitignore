@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+3dbag_obj/
+roof_mesh/
+wireframe/
+xyz/
+metadata/
+_helios/

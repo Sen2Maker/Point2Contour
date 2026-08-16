@@ -1,0 +1,8 @@
+name: point2contour-helios
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - helios=2.2.2
+  - laspy>=2.5
+  - numpy>=1.24
