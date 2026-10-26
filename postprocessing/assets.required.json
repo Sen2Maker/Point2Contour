@@ -1,0 +1,48 @@
+{
+  "status": "required_assets_not_packaged",
+  "security": "Pickle can execute code. Load only trusted assets after verifying their hashes. Hash verification is not a sandbox.",
+  "assets": [
+    {
+      "role": "graph_actor",
+      "proposed_filename": "graph_actor.pkl",
+      "sha256": "36014f69be8a0087151a91be75a69978fa6b929f78f75a708844aa4bf731150b",
+      "bytes": 101824,
+      "included": false
+    },
+    {
+      "role": "connection_classifier",
+      "proposed_filename": "connection_classifier.pkl",
+      "sha256": "db4b8058b42cc26f9d76994a1a56e92f2466ab9d39e775a036431a51ffa21b3d",
+      "bytes": 253697,
+      "included": false
+    },
+    {
+      "role": "local_edit_models",
+      "proposed_filename": "local_edit_models.pkl",
+      "sha256": "b3d3cd20dbdf507c64bb796c7d6c5e5830108ddf7f2316868258931a85d2ca36",
+      "bytes": 4258301,
+      "included": false
+    },
+    {
+      "role": "residual_repair",
+      "proposed_filename": "residual_repair.pkl",
+      "sha256": "65aef1483f79293cf5700f059d23bebb0fe5e13780734eda15b6fc61940ea54d",
+      "bytes": 345769,
+      "included": false
+    },
+    {
+      "role": "edge_pruning",
+      "proposed_filename": "edge_pruning.pkl",
+      "sha256": "03a80bab53363b22e3818ba162a85e4b5bf52db4f168a6dd2db4fd63237d3884",
+      "bytes": 266381,
+      "included": false
+    },
+    {
+      "role": "graph_repair",
+      "proposed_filename": "graph_repair.pkl",
+      "sha256": "3fcc286570b3f3aac90107f825bcc6e099a5cdc9aab8eba59dbe4460f9aeccc6",
+      "bytes": 205473,
+      "included": false
+    }
+  ]
+}

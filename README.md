@@ -2,6 +2,10 @@
 
 Building Rooftop Contouring from Airborne Laser Scanning Point Clouds.
 
+Review additions: [comparison parameter recipes](comparisons/README.md) and
+[structured wireframe reconstruction](postprocessing/README.md). The latter is
+a documented extraction in progress, not yet a complete inference package.
+
 ## Table of Contents
 
 - [Pipeline](#pipeline)
@@ -234,6 +238,11 @@ python eval/eval_lineseg.py --target-dir /path/to/inference_results
 The input layout, metric definitions, output reports, and additional options are documented in [`eval/README.md`](eval/README.md).
 
 ## Post-processing and Applications
+
+The script below is the original geometric utility. It does **not** implement the
+current learned-and-geometric reconstruction described in
+[`postprocessing/README.md`](postprocessing/README.md). Do not interchange their
+outputs when reproducing reported wireframe results.
 
 The primary output of Point2Contour is the predicted line cloud. For applications that require an explicit roof graph, `tools/post.py` can further convert it into a compact wireframe. The postprocessor clusters nearby endpoints, aggregates repeated segment evidence, and applies geometric and point-support constraints to construct candidate edges.
 

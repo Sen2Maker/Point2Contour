@@ -1,0 +1,138 @@
+{
+  "upstream_repository": "https://github.com/xiaohulugo/3DLineDetection.git",
+  "upstream_commit": "f7a0976a86007b8cc82943c7d0ab63c0a68af495",
+  "scope": "Existing parameter constants only; no I/O, compatibility, build or geometry changes.",
+  "parameters": [
+    {
+      "name": "k",
+      "default": 20,
+      "tuned": 48,
+      "file": "src/main.cpp",
+      "replacements": [
+        {
+          "before": "int k = 20;",
+          "after": "int k = 48;"
+        }
+      ]
+    },
+    {
+      "name": "grow_angle_deg",
+      "default": 15.0,
+      "tuned": 20.0,
+      "file": "src/LineDetection3D.cpp",
+      "replacements": [
+        {
+          "before": "double thAngle = 15.0/180.0*CV_PI;",
+          "after": "double thAngle = 20.0/180.0*CV_PI;"
+        }
+      ]
+    },
+    {
+      "name": "min_region",
+      "default": 30,
+      "tuned": 10,
+      "file": "src/LineDetection3D.cpp",
+      "replacements": [
+        {
+          "before": "clusterTemp.size() > 30",
+          "after": "clusterTemp.size() > 10"
+        }
+      ]
+    },
+    {
+      "name": "min_line_pixel",
+      "default": 10.0,
+      "tuned": 5.0,
+      "file": "src/LineDetection3D.cpp",
+      "replacements": [
+        {
+          "before": "max(thLineLength/gridSideLength,10.0)",
+          "after": "max(thLineLength/gridSideLength,5.0)"
+        }
+      ]
+    },
+    {
+      "name": "outlier_in_deg",
+      "default": 12.5,
+      "tuned": 20.0,
+      "file": "src/LineDetection3D.cpp",
+      "replacements": [
+        {
+          "before": "cos(12.5/180.0*CV_PI)",
+          "after": "cos(20.0/180.0*CV_PI)"
+        },
+        {
+          "before": "double thAngle = 12.5;",
+          "after": "double thAngle = 20.0;"
+        }
+      ]
+    },
+    {
+      "name": "nonstruct_line_ratio",
+      "default": 10.0,
+      "tuned": 3.0,
+      "file": "src/LineDetection3D.cpp",
+      "replacements": [
+        {
+          "before": "double thNonStructLineRatio = 10;",
+          "after": "double thNonStructLineRatio = 3.0;"
+        }
+      ]
+    },
+    {
+      "name": "merge_ortho_ratio",
+      "default": 6.0,
+      "tuned": 4.0,
+      "file": "src/LineDetection3D.cpp",
+      "replacements": [
+        {
+          "before": "double thMergeRatio = 6;",
+          "after": "double thMergeRatio = 4.0;"
+        }
+      ]
+    },
+    {
+      "name": "struct_plane_factor",
+      "default": 60.0,
+      "tuned": 30.0,
+      "file": "src/LineDetection3D.cpp",
+      "replacements": [
+        {
+          "before": "double thStructPlane = 60*this->scale;",
+          "after": "double thStructPlane = 30.0*this->scale;"
+        }
+      ]
+    },
+    {
+      "name": "contour_min_deviation",
+      "default": 6.0,
+      "tuned": 3.0,
+      "file": "src/CommonFunctions.cpp",
+      "replacements": [
+        {
+          "before": "double minDeviation = 6.0;",
+          "after": "double minDeviation = 3.0;"
+        }
+      ]
+    }
+  ],
+  "original_sha256": {
+    "CMakeLists.txt": "2567e38838c832f340075c47c57802e2f995a47edf0ba039938747a588304373",
+    "LICENSE": "fe638e1a75964a98f44b1a97445f8cc7c9fa86d6a3fa86a38ec960ee279c367e",
+    "README.md": "8ea5561c4ad4257421958665d6376d7a6e12dd8ba042a4ca3ffe387f4d708f07",
+    "src/CMakeLists.txt": "06588e115ecab9d5538a9b01bd105eb3999e8b5fa43bbf50fdd04fd933bc693f",
+    "src/CommonFunctions.cpp": "03865e0b20e452f7644ae669f2baef23e056c1c41f19adb00ea0da4c9babea51",
+    "src/CommonFunctions.h": "b678e9360de577f5e2047f7e6dba963d49200489b00858bf09f8a5602d6cedb7",
+    "src/LineDetection3D.cpp": "1c776aff3bb67eda650052adc37feb5f9c44d319ab38fa73d0fb9133cb30e9e9",
+    "src/LineDetection3D.h": "03f7580590d194fd3b3f889de449d4147b3145108feb54940ad7c2d7b5a6ba66",
+    "src/Timer.h": "9f24238f4464d3ce900dbd712bf1dbcb81b8107ffb14df301585e64c0e8c9588",
+    "src/main.cpp": "26f1fdfad6da319701e2a103babd9eefeadfe403e22558629c2c528edff96bb1",
+    "src/nanoflann.hpp": "ba3243901b2528aef423eafa6c18843d14605a6264d9ee4c47123cceea24c387",
+    "src/utils.h": "b3325c52b24fb348eaa6db815e91bd20b63142e8bee0ee0816c71e7e7cc78fac"
+  },
+  "tuned_sha256": {
+    "src/CommonFunctions.cpp": "6a830ee84f19db9d68e1062af15f51fd46fc3ed1499568a27a31b0cf37665fc2",
+    "src/LineDetection3D.cpp": "0c5ff6dbd3bfa034381dbad7ded8b5aae7f1861a35fcf34d8f9e291faebde131",
+    "src/main.cpp": "3d0d5a941f184abfb760688cc8ff3d8dd11584630319ec547f8d0d5ccb6fdd25"
+  }
+}

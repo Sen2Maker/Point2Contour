@@ -1,0 +1,111 @@
+{
+  "upstream_repository": "https://github.com/uhzoaix/NerVE",
+  "upstream_commit": "20730c0415ebfb7f87c8124560bf87e29ac91806",
+  "parameters": [
+    {
+      "name": "cube_probability",
+      "file": "network/model.py",
+      "default": 0.5,
+      "tuned": 0.2,
+      "replacements": [
+        {
+          "before": "    def predict_curve(self, model_input):\n        k = model_input['info']['grid_size']\n        cid = model_input['info']['cube_grid_idx']\n\n        topo_feat = self.encoder(model_input)\n        cube_feat = topo_feat[cid[:,0], cid[:,1],cid[:,2]]\n        out_cube = self.decoder_cube.forward_simple(cube_feat)\n\n        # pred edge idx\n        # out_cube: (N_cubepc, 1)\n        if self.predict_type == 'BCE':\n            out_cube = self.sigmoid(out_cube) > 0.5\n            out_cube = out_cube.squeeze(-1)\n        else:\n            out_cube = out_cube[:,0] < out_cube[:,1]\n\n        # out_cube = (out_cube > 0.5).squeeze(-1)\n        peid = cid[out_cube]\n        edge_topo = {\n            'grid_size': k,\n            'cube_idx': peid.detach().cpu().numpy(),\n        }\n\n        return edge_topo, peid\n",
+          "after": "    def predict_curve(self, model_input):\n        k = model_input['info']['grid_size']\n        cid = model_input['info']['cube_grid_idx']\n\n        topo_feat = self.encoder(model_input)\n        cube_feat = topo_feat[cid[:,0], cid[:,1],cid[:,2]]\n        out_cube = self.decoder_cube.forward_simple(cube_feat)\n\n        # pred edge idx\n        # out_cube: (N_cubepc, 1)\n        if self.predict_type == 'BCE':\n            out_cube = self.sigmoid(out_cube) > 0.2\n            out_cube = out_cube.squeeze(-1)\n        else:\n            out_cube = out_cube[:,0] < out_cube[:,1]\n\n        # out_cube = (out_cube > 0.5).squeeze(-1)\n        peid = cid[out_cube]\n        edge_topo = {\n            'grid_size': k,\n            'cube_idx': peid.detach().cpu().numpy(),\n        }\n\n        return edge_topo, peid\n"
+        }
+      ]
+    },
+    {
+      "name": "curve_query_radius",
+      "file": "utils/pwl2CAD/CAD_curve.py",
+      "default": 4,
+      "tuned": 6,
+      "replacements": [
+        {
+          "before": "'query_ball_radius': 4,",
+          "after": "'query_ball_radius': 6,"
+        }
+      ]
+    },
+    {
+      "name": "curve_delete_length",
+      "file": "utils/pwl2CAD/CAD_curve.py",
+      "default": 5,
+      "tuned": 0,
+      "replacements": [
+        {
+          "before": "'delete_max_length': 5,",
+          "after": "'delete_max_length': 0,"
+        }
+      ]
+    },
+    {
+      "name": "curve_smoothing",
+      "file": "utils/pwl2CAD/CAD_curve.py",
+      "default": 3,
+      "tuned": 0,
+      "replacements": [
+        {
+          "before": "curve.path_smoothing(new_paths, niter=3)",
+          "after": "curve.path_smoothing(new_paths, niter=0)"
+        }
+      ]
+    },
+    {
+      "name": "face_probability",
+      "file": "network/model.py",
+      "default": 0.5,
+      "tuned": 0.2,
+      "replacements": [
+        {
+          "before": "    def predict_curve(self, model_input, peid):\n        k = model_input['info']['grid_size']\n        topo_feat = self.encoder(model_input)\n        N_e = peid.shape[0]\n        if N_e == 0:\n            return None\n\n        cube_edge_feat = topo_feat[peid[:,0], peid[:,1],peid[:,2]]\n        peid_nn = peid[:,None,:] + self.cube_neighbor\n        peid_nn = peid_nn.reshape(N_e*3, 3)\n        torch.clamp_(peid_nn, 0, k-1)\n        feat_nn = topo_feat[peid_nn[:,0],peid_nn[:,1],peid_nn[:,2]].reshape(N_e,3,-1)\n\n        out_face = self.net_face(cube_edge_feat, feat_nn)\n        if self.predict_type == 'BCE':\n            out_face = self.sigmoid(out_face) > 0.5\n            out_face = out_face.squeeze(-1)\n        else:\n            out_face = out_face[..., 0] < out_face[..., 1]        \n\n        edge_topo = {\n            'cube_faces': out_face.detach().cpu().numpy()\n        }\n\n        return edge_topo",
+          "after": "    def predict_curve(self, model_input, peid):\n        k = model_input['info']['grid_size']\n        topo_feat = self.encoder(model_input)\n        N_e = peid.shape[0]\n        if N_e == 0:\n            return None\n\n        cube_edge_feat = topo_feat[peid[:,0], peid[:,1],peid[:,2]]\n        peid_nn = peid[:,None,:] + self.cube_neighbor\n        peid_nn = peid_nn.reshape(N_e*3, 3)\n        torch.clamp_(peid_nn, 0, k-1)\n        feat_nn = topo_feat[peid_nn[:,0],peid_nn[:,1],peid_nn[:,2]].reshape(N_e,3,-1)\n\n        out_face = self.net_face(cube_edge_feat, feat_nn)\n        if self.predict_type == 'BCE':\n            out_face = self.sigmoid(out_face) > 0.2\n            out_face = out_face.squeeze(-1)\n        else:\n            out_face = out_face[..., 0] < out_face[..., 1]        \n\n        edge_topo = {\n            'cube_faces': out_face.detach().cpu().numpy()\n        }\n\n        return edge_topo"
+        }
+      ]
+    }
+  ],
+  "original_sha256": {
+    ".gitignore": "caebc5623f6023fcd1755c4ee7d2901aec679ae996ad855f9e28953da6e1f73f",
+    "LICENSE": "10f23bd4bb3d1558c73c359f81a90aa91be6df7c8e1d935865ab36ad9341e9c4",
+    "README.md": "28d1a9fa85922b20560eb3f8014bb194d906f8f3e50b4fe2e10c37d0b27a3cf8",
+    "Teaser.png": "0670147063ebff1be272f68abbb1ea17534e387eede4ebf66522e99bfbc849f6",
+    "data/__init__.py": "818f6bc2e5d0778938e54dcb4a1a1ce95649bca4a8c32a3fa141183c71b57164",
+    "data/dataset.py": "23cfd24fde7ed0b9194a498e49e6cd3b48a9ab936e3a605d71e9a34b94881374",
+    "demo_predict_pwl.py": "9b065f1afeb159012c0b705ca1c6c7b9d1be67e8b1c54abf1b699944e323530b",
+    "exp/template/cube.yaml": "215615e3841d8d7a0b17e50fab8ebdf89635984067de4bdfa3d0fa76c851a52a",
+    "exp/template/face.yaml": "5030fd86d06b6adcadf8b7770d2ba37d18ef219b1ce26033f37075cd54488ccd",
+    "exp/template/geom.yaml": "12346eee657ba7d7a7f53c9b4528c8424bce502a8566526d047f825a3ba53e4f",
+    "more_results.jpg": "0f58eb90676c3ac68ee784445408cc7baae2dbe89b20addfb948067af77a0490",
+    "network/__init__.py": "556836c32421aef26d6eb46aa7f213dd0dee0afd857ba69483a946fb7d31c9cc",
+    "network/activation.py": "9d66c126820c3b622934355601543a5d83725dddb83cfefa22291951ea4c0d8f",
+    "network/avg_pooling/grid_pooling.cpp": "843a4e90cfed8c601de7578f9e6afd24fa9d9f29434bf4eda7d1b1bd5c5bf399",
+    "network/avg_pooling/grid_pooling_kernel.cu": "1bc4cca196ab71c607802e3b33d68eb144d5c6d69767bd576e9e7a40690a2c6a",
+    "network/avg_pooling/include/utils.h": "b12a5abb41e0cc34e971cfb0c155af89a7bd5d35666344bd034df22ef78a07b8",
+    "network/avg_pooling/setup.py": "c76c4eeee3147faa44f515b063cca97c8529e953ad996955a18abe3a91fa2a1c",
+    "network/grid.py": "5f6abbc211c38ab8af2c073347d2484a78a6a7eb4e907017a230e8348e57146a",
+    "network/grid_pooling_func.py": "307268a3605bc6ac73161f23fc6f13147324e30b7d0f29583bb0d3cb3fa9e786",
+    "network/mlp.py": "0f42e8dae4aa9fb060cddd29a6d20dc685e82513b4fe55df27dd7a283674bc36",
+    "network/model.py": "d2eb570c357ff0748cdb2a06c8b217292447d0c23feaabd6fd1b369890490fa8",
+    "network/pos_encoding.py": "6cd91d9cc609b1a308e88c5ae11bdc0237d8d18d795ed0ee620fefd59bb9ec1c",
+    "requirements.txt": "527c4cc0a26a735db32d8ece7e31908daea08d592125cd42837fc235cb77c405",
+    "train_net.py": "c95b89afe3a2743384aa0d6c354ad9f3c540183d873929fef316b26f6487019a",
+    "training/__init__.py": "6eab43a4666a801d85c4f64bcd53f6af12e53ae69b34c58077a7793da8a16433",
+    "training/loss.py": "d213486b85b40e292af828c5696e69e5a5258f56605a6e3d30b3e75f635deeba",
+    "training/train.py": "8cbeb809ea6e2207bfe33f401b9d5fae3d5cb448e4346ac2b4904c05a8111e2f",
+    "utils/__init__.py": "7f7e483af12913ac94d87c2da6d7cfe074e1702b7fe8ae41f439a099f68d27a9",
+    "utils/options.py": "d57e202b3b3a9fd100bc9f0715f864e4c4ac8624973bc920174b84b7f24e1264",
+    "utils/prepare_data/README.md": "df8ba9c2cd659deeed900973a8b9e9eb02422557e312699864ad6eb10b0a1e81",
+    "utils/prepare_data/obj_point_cloud.py": "16a4deb0227868a9e704f20ceec9c483ad058681627fe65884fa9942ef3747e0",
+    "utils/prepare_data/step_edge2NerVE.py": "b06047a432363cd7fe7da62cb52276bfd0398eef0b800a4ac530ededb3c03f62",
+    "utils/prepare_data/step_samples.py": "2f99924d3b0bfebbaa14e16d3c7f7924572db8c6c108918b508964d59c9f3f4f",
+    "utils/pwl2CAD/CAD_curve.py": "a83fcdbf43526039f5e18356fba9ed9509d38640f318b98b22814b0037408883",
+    "utils/pwl2CAD/eval_cad_curve.py": "dd3cfed083de9c7f716bb4d8c7f08da4d8687e30f1ba0a793dae03f8258da482",
+    "utils/visualization_blender/batch_render_curve.py": "6791a3ad523c24ba493f958f8e71ffc651d4b9fc171ce235583661f5671f5c44",
+    "utils/visualization_blender/vis_cad_curve.py": "e2b619312c82f23d73b8461ac059b6aae44452efcff73ff92e4ef33d2af4eef6",
+    "utils/visualization_blender/vis_nerve_grid.py": "ebcd32f31ea60c3e284348174900f91879d10edf1d2995d09bea58eb5fd670a9",
+    "utils/visualization_blender/vis_pwl_curve.py": "f96bd3ace5d48459406d441e18ba1807a876e1a65f9fb5daa4255e20ba69fe64"
+  },
+  "tuned_sha256": {
+    "network/model.py": "182e7f9386f2924c389fa79e118785810a5ecba04c8d3407d4a5b0c52fd456ac",
+    "utils/pwl2CAD/CAD_curve.py": "490e298f3c53fc6847b28464a73a6c08b907689ff712da7e8e58d6a50788af01"
+  }
+}

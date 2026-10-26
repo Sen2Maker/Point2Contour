@@ -1,0 +1,14 @@
+{
+  "alpha": 0.5,
+  "mu": 0.07,
+  "feature_knn": 40,
+  "radius_factor": 4.0,
+  "attract_factor": 3.0,
+  "exclude_knn": 8,
+  "direction_cosine": 0.85,
+  "keep_ratio": 0.1,
+  "grow_knn": 15,
+  "min_cluster": 10,
+  "epsilon_factor": 1.0,
+  "fpo_max_iters": 30
+}
