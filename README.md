@@ -4,7 +4,7 @@ Building Rooftop Contouring from Airborne Laser Scanning Point Clouds.
 
 Review additions: [comparison parameter recipes](comparisons/README.md) and
 [structured wireframe reconstruction](postprocessing/README.md). The latter is
-a documented extraction in progress, not yet a complete inference package.
+the frozen CPU reconstruction implementation, with a separate trusted asset bundle.
 
 ## Table of Contents
 

@@ -1,38 +1,48 @@
 # Release candidate review
 
-This branch is a **partial review draft**, not a complete public reproduction.
-Existing model/training/evaluation code is unchanged.
+This branch is a review candidate, not a published release. It does not change main.
 
 ## Included
 
-- Independent comparison directories with pinned upstream revisions and explicit
-  parameter configurations; no external method source tree is vendored.
-- The existing 3DLineDetection parameter recipe, preserving its distinction
-  between parameter changes and separate input/output adaptations.
-- A reversible NerVE parameter patch and a configuration-selecting Xin wrapper.
-- A process-named description of current wireframe reconstruction, synthetic-tested
-  evidence utilities, and hashes of required (not included) frozen assets.
+- Source-only comparison recipes with pinned external repositories. No third-party
+  comparison implementations or pretrained weights are vendored. Xin's independent
+  implementation remains in its separate repository.
+- Complete frozen CPU graph reconstruction, with geometry, learned editing and
+  multi-round ordinary/mode endpoint evidence. Public entry points use process
+  names, not historical development version labels.
+- A read-only network evidence exporter enabled by `--export-evidence`.
+- A separate hash-bound frozen-editor asset bundle; no model assets or experiments
+  are stored inside this code checkout.
+- Explicit completed-epoch checkpoint metadata and corrected restart boundaries.
 
-## Verified in this draft
+## Verification
 
-- NerVE patch dry run, application, idempotence, restoration and clean upstream
-  readback. No model execution or metrics were run.
-- Shell syntax and six synthetic evidence tests.
-- Added public material contains no local experiment paths or numbered historical
-  postprocessing names.
+Tests are run in an independent experiment directory. The review includes
+saved-evidence parity on Tallinn and Tokyo, actual ordinary/mode connection
+completion cases, empty/degenerate evidence, and a real original-checkpoint
+evidence-export/OBJ smoke test. The latter reproduces all 15 saved arrays exactly
+and the final reference OBJ byte-for-byte for the tested building.
 
-The copied 3DLineDetection recipe has not been re-executed against a fresh upstream
-checkout in this review. The Xin wrapper has not been used for extraction in this
-review. Their existing experiment validation is not a test of this new packaging.
+This is sample-level parity, not a full-dataset rerun or a new platform score.
+Use the frozen CPU environment described in `postprocessing/README.md` for the
+historical sklearn model state. A clean-machine dependency installation remains
+untested. The network environment and CPU reconstruction environment are distinct.
 
-## Not ready for release
+Checkpoint tests cover old before-epoch snapshots and new after-epoch snapshots.
+Legacy `model_latest` / `model_epoch` files resume at their recorded, not-yet-run
+epoch. New files resume at `next_epoch` after completed training, validation and
+scheduler stepping. Filenames keep zero-based epoch indices: `0089` is the last
+epoch of a 90-epoch run. No new training was started for this repair.
 
-1. Complete postprocessor runtime extraction, evidence-export CLI and frozen model
-   packaging remain unfinished. There is no complete runnable wireframe CLI here.
-2. Complete-output equivalence with saved evidence has not been tested for the new
-   packaging. Unit tests cannot replace this check.
-3. The repository has no top-level redistribution license. The owner must choose
-   one before this can be called a licensed open-source release. External projects
-   retain their own licenses; model asset rights/provenance must also be checked.
+## Intentionally unchanged
 
-Do not publish the partial utilities as a replacement for the evaluated pipeline.
+The existing no-edge fallback, evaluation definitions, and batch inference exit
+policy were not changed in this review. They must not be assumed to implement
+different experiment protocols merely because reconstruction now runs.
+
+The 3DLineDetection and Xin wrappers are not complete standalone experiment
+packages. External code, environments, data adapters and weights remain the user's
+responsibility. No third-party code has been added to fix this limitation.
+
+The repository still has no top-level redistribution license; model asset rights
+and public hosting must be approved separately. No push or publication is implied.

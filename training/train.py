@@ -8,6 +8,7 @@ import copy
 
 from loss import JointWireframeLoss
 from optimizer import get_optimizer
+from checkpoint_state import next_training_epoch, completed_epoch_fields
 
 def train_model(opt, model):
     optim = get_optimizer(opt, model)
@@ -37,7 +38,7 @@ def train_model(opt, model):
 
         ckpt = torch.load(ckpt_path, map_location='cuda')
 
-        start_epoch = int(ckpt['epoch']) + 1
+        start_epoch = next_training_epoch(ckpt)
         total_steps = int(ckpt.get('steps_train', 0))
         total_val_steps = int(ckpt.get('steps_val_steps', 0))
 
@@ -57,7 +58,8 @@ def train_model(opt, model):
         model.load_state_dict(model_state)
         print(f"Resumed training: loaded={matched}, skipped={skipped}.")
 
-        epoch_lr.load_state_dict(ckpt['scheduler_state_dict'])
+        if epoch_lr is not None:
+            epoch_lr.load_state_dict(ckpt['scheduler_state_dict'])
 
         ema_model.module.load_state_dict(ckpt['ema_state_dict'])
 
@@ -70,27 +72,6 @@ def train_model(opt, model):
         for epoch in epoch_pbar:
             epoch_pbar.set_description(f"Epoch {epoch}/{opt.num_epochs - 1}")
             model.train()
-
-            if not epoch % opt.ckpt_epoch and epoch:
-                save_path = os.path.join(checkpoints_dir, f'model_epoch_{epoch:04d}.pth')
-                torch.save({
-                    'epoch': epoch,
-                    'steps_train': total_steps,
-                    'steps_val_steps': total_val_steps,
-                    'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optim.state_dict(),
-                    'ema_state_dict': ema_model.module.state_dict(),
-                    'scheduler_state_dict': epoch_lr.state_dict() if epoch_lr else None,
-                }, save_path)
-
-                latest = os.path.join(checkpoints_dir, 'model_latest.pth')
-                try:
-                    if os.path.exists(latest):
-                        os.remove(latest)
-                    os.link(save_path, latest)
-                except Exception:
-                    import shutil
-                    shutil.copyfile(save_path, latest)
 
             train_loss_log = {}
             total_train_loss_list = []
@@ -196,8 +177,33 @@ def train_model(opt, model):
             if epoch_lr is not None:
                 epoch_lr.step()
 
+            if (epoch + 1) % opt.ckpt_epoch == 0 or epoch + 1 == opt.num_epochs:
+                save_path = os.path.join(checkpoints_dir, f'model_epoch_{epoch:04d}.pth')
+                snapshot = {
+                    **completed_epoch_fields(epoch),
+                    'steps_train': total_steps,
+                    'steps_val_steps': total_val_steps,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optim.state_dict(),
+                    'ema_state_dict': ema_model.module.state_dict(),
+                    'scheduler_state_dict': epoch_lr.state_dict() if epoch_lr else None,
+                }
+                temporary = save_path + '.partial'
+                torch.save(snapshot, temporary)
+                os.replace(temporary, save_path)
+                latest = os.path.join(checkpoints_dir, 'model_latest.pth')
+                temporary_latest = latest + '.partial'
+                if os.path.exists(temporary_latest):
+                    raise FileExistsError(temporary_latest)
+                try:
+                    os.link(save_path, temporary_latest)
+                except OSError:
+                    import shutil
+                    shutil.copyfile(save_path, temporary_latest)
+                os.replace(temporary_latest, latest)
+
         torch.save({
-            'epoch': opt.num_epochs - 1,
+            **completed_epoch_fields(opt.num_epochs - 1),
             'steps_train': total_steps,
             'steps_val_steps': total_val_steps,
             'model_state_dict': model.state_dict(),

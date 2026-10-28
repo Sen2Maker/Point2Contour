@@ -1,10 +1,43 @@
 # Structured wireframe reconstruction
 
-**Review draft:** this directory documents the current method and provides its
-response-selection and geometric support utilities. The complete frozen graph
-decoder and learned feature runtime are not yet packaged. It is not an executable
-replacement for the evaluated pipeline. Do not use `tools/post.py` as a substitute
-and label its results as this method.
+This directory provides the frozen CPU graph decoder, geometric repair, learned
+editing and multi-round connection completion used by the evaluated pipeline.
+It is separate from the original geometric utility `tools/post.py`.
+The trusted frozen editor asset is distributed separately from the code checkout.
+
+## Running
+
+First export evidence in the **network environment**. This records the existing
+forward pass without changing its outputs; it does not add another refinement pass.
+
+```bash
+python pre_fromxyz.py --xyz-root /path/to/roof.xyz \
+  --model-dir /path/to/original-split-model --output-dir /path/to/results \
+  --export-evidence --stop-on-error
+```
+
+Then use the **CPU reconstruction environment** (Python 3.8.3, NumPy 1.23.5,
+SciPy 1.5.0, scikit-learn 0.23.1). An environment specification is provided in
+`environment.yml`; installation on a clean machine has not been independently
+tested. Do not load the historical sklearn asset in the newer GPU environment.
+
+```bash
+python -m postprocessing.reconstruct \
+  --input /path/to/results/roof/input.npz \
+  --distributions /path/to/results/roof/distributions.npz \
+  --assets /path/to/Point2Contour-postprocessing-assets \
+  --output /path/to/results/roof/structured.obj
+```
+
+Run from the repository root or add it to `PYTHONPATH`. The decoder reconstructs
+the primary graph from the supplied evidence, not cached per-building graphs.
+It writes metric-coordinate OBJ plus a JSON hash receipt and refuses existing
+output paths. The asset SHA-256 is verified before deserialization. Pickle is not
+a safe format for arbitrary untrusted downloads; use only the trusted asset.
+
+Input arrays are `pc[N,3]`, `ep[E,3]`, `raw[L,2,3]` in metres. Each of the three
+rounds has aligned `raw_k`, `mode_k`, `candidate_i_k` and `bin_k` arrays; `raw`
+must match `raw_2`. NMS-only OBJ files cannot substitute for these records.
 
 ## Process
 
@@ -57,17 +90,16 @@ training or parameter selection from evaluation feedback. Preserve the provenanc
 of learned editors and the disclosed GT-associated input normalization. Do not
 describe this pipeline as parameter-free, learning-free or an untouched blind test.
 
-## Release requirements
+## Verification and scope
 
-Before this directory can be advertised as a reproducible inference package:
+The source-only runtime closure preserves the evaluated numerical operations;
+only fixed dispatch, dependency binding and process-oriented naming were changed.
+`_primitives.py` contains the geometry and editing functions; `_runtime.py` binds
+their separate namespaces and frozen constants without importing experiment code.
+There are no training, scoring or historical experiment entry points in this path.
 
-- Extract the complete graph decoder and feature runtime without evaluation,
-  training, private paths or historical experiment dependencies.
-- Package the six required frozen model assets with verified hashes, compatible
-  runtime versions, provenance and redistribution permission.
-- Verify complete-output equivalence against existing saved array fixtures in
-  an experiment workspace, including empty and degenerate inputs.
-- Connect a network evidence exporter and CLI, with explicit input/output schemas.
-
-Current utilities have synthetic unit tests only; those tests do not certify the
-complete pipeline or the learned components.
+Saved-evidence parity and an actual old-checkpoint evidence-export smoke test are
+performed outside the code checkout. These checks are not a new platform score,
+not a full-dataset rerun, and not evidence that every installation is supported.
+Keep the provenance of the six original frozen editors with the separate compact
+runtime asset. Licensing and public hosting are independent release decisions.

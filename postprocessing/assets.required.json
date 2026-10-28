@@ -1,5 +1,12 @@
 {
-  "status": "required_assets_not_packaged",
+  "status": "inference_state_provided_in_separate_review_bundle",
+  "runtime_asset": {
+    "filename": "frozen_editors.pkl",
+    "bundle_directory": "Point2Contour-postprocessing-assets",
+    "sha256": "0cdea30038fe474332f41f4401bce1a50d444b6d827ab594bc66a79b7bfc1b6c",
+    "bytes": 1139776,
+    "description": "Inference-reachable state extracted from the six original assets listed below. Their original files are not duplicated inside the source-only repository."
+  },
   "security": "Pickle can execute code. Load only trusted assets after verifying their hashes. Hash verification is not a sandbox.",
   "assets": [
     {

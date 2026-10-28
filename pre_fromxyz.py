@@ -44,6 +44,7 @@ RAW_TOPK_OUTPUT_NAME = "raw_topk.obj"
 
 
 CONTINUE_ON_ERROR = True
+EXPORT_EVIDENCE = False
 
 
 REFINE_THR = 0.75
@@ -104,6 +105,7 @@ def parse_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("--xyz-root", required=True, help="XYZ file or directory containing XYZ files")
+    parser.add_argument("--export-evidence", action="store_true", help="Also export three-round evidence for structured reconstruction")
     parser.add_argument("--gt-root", default=None, help="Optional directory containing GT OBJ files")
     parser.add_argument("--gt-pattern", default=GT_OBJ_FILE_PATTERN, help="GT filename pattern with {id}")
     parser.add_argument("--model-dir", required=True, help="Training result directory")
@@ -403,13 +405,17 @@ def run_one_xyz(
     m_input_cuda = move_tensor_dict(model_input, device)
     gt_cuda = move_tensor_dict(gt, device)
 
-    out = model.predict(
-        m_input_cuda,
-        refine_thresh=REFINE_THR,
-        num_iters=NUM_ITERS,
-    )
+    recorder = None
+    if EXPORT_EVIDENCE:
+        from postprocessing.export_evidence import EvidenceRecorder
+        with EvidenceRecorder(model) as recorder:
+            out = model.predict(m_input_cuda, refine_thresh=REFINE_THR, num_iters=NUM_ITERS)
+    else:
+        out = model.predict(m_input_cuda, refine_thresh=REFINE_THR, num_iters=NUM_ITERS)
 
     real_pc = pre2obj_utils.extract_real_pc(m_input_cuda, gt_cuda)
+    if recorder is not None:
+        recorder.save(scene_dir, out, gt_cuda, real_pc, pre2obj_utils.norm_points_to_real)
     lines_gt = pre2obj_utils.extract_gt_lines(gt_cuda)
     edge_probability = torch.sigmoid(out["edge_mask"]).detach().cpu().numpy()
     point_output = np.column_stack((real_pc, edge_probability))
@@ -481,8 +487,12 @@ def main() -> None:
     global SKIP_EXISTING
     global CONTINUE_ON_ERROR, REFINE_THR, STAGE_THR
     global NUM_ITERS, MIN_LEN
+    global EXPORT_EVIDENCE
 
     args = parse_args()
+    EXPORT_EVIDENCE = args.export_evidence
+    if EXPORT_EVIDENCE and (args.num_iters != 3 or args.refine_threshold != .75 or args.stage_threshold != .75 or args.min_line_length != .15):
+        raise ValueError('Structured reconstruction requires three rounds, thresholds .75/.75 and minimum length .15 m')
     if args.max_files is not None and args.max_files < 1:
         raise ValueError("max-files must be positive.")
     if "{id}" not in args.gt_pattern:
