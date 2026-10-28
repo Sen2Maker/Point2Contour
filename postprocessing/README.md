@@ -16,10 +16,14 @@ python pre_fromxyz.py --xyz-root /path/to/roof.xyz \
   --export-evidence --stop-on-error
 ```
 
-Then use the **CPU reconstruction environment** (Python 3.8.3, NumPy 1.23.5,
-SciPy 1.5.0, scikit-learn 0.23.1). An environment specification is provided in
-`environment.yml`; installation on a clean machine has not been independently
-tested. Do not load the historical sklearn asset in the newer GPU environment.
+Then use the **same network environment** (Python 3.9.23, NumPy 1.26.4,
+SciPy 1.13.1, scikit-learn 1.6.1; network PyTorch 2.6.0 + CUDA 12.6).
+Reconstruction still runs on CPU, but no environment switch is needed.
+`environment.yml` lists the CPU dependency subset, not the full CUDA stack;
+installation on a clean machine has not been independently tested.
+The frozen editors are numeric tree arrays, not cross-version sklearn pickles.
+Tree splits, missing-value routing, leaf values, baselines and iteration order
+are retained without retraining or changing thresholds.
 
 ```bash
 python -m postprocessing.reconstruct \
@@ -32,8 +36,8 @@ python -m postprocessing.reconstruct \
 Run from the repository root or add it to `PYTHONPATH`. The decoder reconstructs
 the primary graph from the supplied evidence, not cached per-building graphs.
 It writes metric-coordinate OBJ plus a JSON hash receipt and refuses existing
-output paths. The asset SHA-256 is verified before deserialization. Pickle is not
-a safe format for arbitrary untrusted downloads; use only the trusted asset.
+output paths. The numeric asset SHA-256 is verified and loaded with
+`allow_pickle=False`. Use the separately supplied `frozen_editors_numeric.npz`.
 
 Input arrays are `pc[N,3]`, `ep[E,3]`, `raw[L,2,3]` in metres. Each of the three
 rounds has aligned `raw_k`, `mode_k`, `candidate_i_k` and `bin_k` arrays; `raw`

@@ -4,7 +4,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import pickle
 import sys
 
 for _name in ('OMP_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'MKL_NUM_THREADS'):
@@ -12,7 +11,7 @@ for _name in ('OMP_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'MKL_NUM_THREADS'):
 
 import numpy as np
 
-ASSET_SHA256 = '0cdea30038fe474332f41f4401bce1a50d444b6d827ab594bc66a79b7bfc1b6c'
+ASSET_SHA256 = '5725f24d0e4598dd7f52f6b0df48470e9866dd61edb68c9df561ff143477959b'
 
 
 def read_arrays(path):
@@ -47,18 +46,16 @@ def validate(arrays, distributions):
 
 class Reconstructor:
     def __init__(self, assets):
-        # The historical sklearn trees are not cross-version portable. Fail
-        # before unpickling instead of silently changing predictions.
-        import sklearn
         import scipy
-        if sys.version_info[:2] != (3, 8) or sklearn.__version__ != '0.23.1' or np.__version__ != '1.23.5' or scipy.__version__ != '1.5.0':
-            raise RuntimeError('Use the frozen CPU environment: Python 3.8, NumPy 1.23.5, SciPy 1.5.0, scikit-learn 0.23.1')
-        path = Path(assets) / 'frozen_editors.pkl'
+        import sklearn
+        if sys.version_info[:2] != (3, 9) or np.__version__ != '1.26.4' or scipy.__version__ != '1.13.1' or sklearn.__version__ != '1.6.1':
+            raise RuntimeError('Use the network environment: Python 3.9, NumPy 1.26.4, SciPy 1.13.1, scikit-learn 1.6.1')
+        path = Path(assets) / 'frozen_editors_numeric.npz'
         payload = path.read_bytes()
         if hashlib.sha256(payload).hexdigest() != ASSET_SHA256:
             raise ValueError('Frozen editor asset hash mismatch')
-        # Only the trusted, hash-bound release asset may be deserialized.
-        state = pickle.loads(payload)
+        from ._portable_trees import load_editors
+        state = load_editors(path)
         from ._runtime import build_runtime
         self.runtime = build_runtime(state)
 

@@ -24,9 +24,19 @@ evidence-export/OBJ smoke test. The latter reproduces all 15 saved arrays exactl
 and the final reference OBJ byte-for-byte for the tested building.
 
 This is sample-level parity, not a full-dataset rerun or a new platform score.
-Use the frozen CPU environment described in `postprocessing/README.md` for the
-historical sklearn model state. A clean-machine dependency installation remains
-untested. The network environment and CPU reconstruction environment are distinct.
+Use the network environment described in `postprocessing/README.md` for both
+network inference and CPU reconstruction. The frozen editor state is exported as
+numeric trees without refitting; historical sklearn pickle loading is unnecessary.
+A clean-machine dependency installation remains untested.
+
+Unified-environment checks: all five numeric editors exactly matched 22,196
+reference feature rows, including every split threshold, adjacent floating-point
+values and missing values. All 24 real Tallinn/Tokyo cases and two empty-input
+boundaries passed. The maximum deviation from historical OBJ geometry was
+1.025e-8 m (below the 1e-6 m tolerance); the exported-evidence smoke OBJ was
+byte-identical. All 21 unit tests passed. No training or fresh GPU inference was
+needed for this migration. The previous dual-environment implementation remains
+available in commit `4355e3b`, with its original asset preserved separately.
 
 Checkpoint tests cover old before-epoch snapshots and new after-epoch snapshots.
 Legacy `model_latest` / `model_epoch` files resume at their recorded, not-yet-run

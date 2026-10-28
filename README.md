@@ -5,6 +5,8 @@ Building Rooftop Contouring from Airborne Laser Scanning Point Clouds.
 Review additions: [comparison parameter recipes](comparisons/README.md) and
 [structured wireframe reconstruction](postprocessing/README.md). The latter is
 the frozen CPU reconstruction implementation, with a separate trusted asset bundle.
+Network inference and reconstruction use the same Python 3.9 environment; see
+the reconstruction README for the verified dependency versions and numeric assets.
 
 ## Table of Contents
 
