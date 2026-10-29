@@ -38,6 +38,14 @@ byte-identical. All 21 unit tests passed. No training or fresh GPU inference was
 needed for this migration. The previous dual-environment implementation remains
 available in commit `4355e3b`, with its original asset preserved separately.
 
+Follow-up fixes (2026-10-29): root installation requirements now pin the tested
+direct dependencies, including the numeric/cluster stack required by reconstruction.
+Classifier `predict` returns labels; raw scores are exposed by `decision_function`.
+Regression predictions and classifier probabilities are unchanged. All 25 unit
+tests pass, all 22,196 frozen-editor reference rows remain exactly equal, and the
+real saved-evidence smoke OBJ remains byte-identical. This does not replace a
+clean-machine installation test or constitute a full transitive dependency lock.
+
 Checkpoint tests cover old before-epoch snapshots and new after-epoch snapshots.
 Legacy `model_latest` / `model_epoch` files resume at their recorded, not-yet-run
 epoch. New files resume at `next_epoch` after completed training, validation and

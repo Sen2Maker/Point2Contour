@@ -1,8 +1,9 @@
-configargparse
-tensorboard
+configargparse==1.7
+tensorboard==2.20.0
 trimesh==3.9.29
-dotted
-tqdm
-scipy
-scikit-learn
-pyyaml
+dotted==0.1.8
+tqdm==4.66.1
+numpy==1.26.4
+scipy==1.13.1
+scikit-learn==1.6.1
+pyyaml==6.0.1

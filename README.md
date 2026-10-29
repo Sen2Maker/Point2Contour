@@ -30,7 +30,7 @@ the reconstruction README for the verified dependency versions and numeric asset
 git clone https://github.com/Sen2Maker/Point2Contour.git
 cd Point2Contour
 
-conda create -n point2contour python=3.9 -y
+conda create -n point2contour python=3.9.23 -y
 conda activate point2contour
 ```
 
@@ -42,11 +42,17 @@ pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 \
 ```
 >**NOTE:** For other CUDA versions, install a compatible PyTorch version; compatibility with other CUDA versions is not guaranteed.
 
-(3) Install simple dependencies:
+(3) Install the pinned direct dependencies for the unified network/reconstruction environment:
 
 ```bash
 pip install -r requirements.txt
 ```
+
+The NumPy, SciPy and scikit-learn pins are required by the verified reconstruction
+runtime; do not replace them with unpinned latest versions. These are direct
+dependency pins, not a complete transitive lockfile. Clean-machine installation
+has not yet been independently tested. The reconstruction environment YAML is
+only a CPU dependency subset, not an alternative full network installation.
 
 (4) The KNN operations in this model depend on PyTorch3D. For the tested environment (Python 3.9, PyTorch 2.6.0, and CUDA 12.6), a third-party precompiled wheel can be installed as follows:
 

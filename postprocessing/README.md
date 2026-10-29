@@ -24,6 +24,11 @@ installation on a clean machine has not been independently tested.
 The frozen editors are numeric tree arrays, not cross-version sklearn pickles.
 Tree splits, missing-value routing, leaf values, baselines and iteration order
 are retained without retraining or changing thresholds.
+Install the root `requirements.txt` for the pinned direct dependencies. Frozen
+classifiers expose labels through `predict`, probabilities through `predict_proba`,
+and raw scores through `decision_function`; regressors return values via `predict`.
+This is an inference-only interface for the supplied trees, not a general sklearn
+estimator replacement.
 
 ```bash
 python -m postprocessing.reconstruct \

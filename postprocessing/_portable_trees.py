@@ -11,7 +11,7 @@ class FrozenTrees:
         self.trees = [archive[key + '_tree_' + str(i)].copy()
                       for i in range(int(archive[key + '_count']))]
 
-    def predict(self, X):
+    def _raw_predict(self, X):
         X = np.asarray(X, dtype=np.float64)
         if X.ndim != 2 or X.shape[1] != self.n_features_in_:
             raise ValueError('Invalid editor feature matrix')
@@ -31,10 +31,21 @@ class FrozenTrees:
                 indices[active] = np.where(left, nodes['left'], nodes['right'])
         return result
 
+    def predict(self, X):
+        """Return class labels for classifiers, numeric values for regressors."""
+        if len(self.classes_):
+            return self.classes_[np.argmax(self.predict_proba(X), axis=1)]
+        return self._raw_predict(X)
+
+    def decision_function(self, X):
+        if not np.array_equal(self.classes_, [0, 1]):
+            raise ValueError('Decision scores require a frozen binary classifier')
+        return self._raw_predict(X)
+
     def predict_proba(self, X):
         if not np.array_equal(self.classes_, [0, 1]):
             raise ValueError('Only the frozen binary editors are supported')
-        positive = expit(self.predict(X))
+        positive = expit(self.decision_function(X))
         return np.column_stack((1.0 - positive, positive))
 
 

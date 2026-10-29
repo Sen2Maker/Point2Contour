@@ -15,7 +15,7 @@ class TreeTests(unittest.TestCase):
                             'a_count':1,'a_tree_0':nodes},'a')
 
     def test_boundary_and_missing(self):
-        actual=self.model().predict([[.5],[np.nextafter(.5,np.inf)],[np.nan]])
+        actual=self.model().decision_function([[.5],[np.nextafter(.5,np.inf)],[np.nan]])
         np.testing.assert_array_equal(actual,[-1,4,-1])
 
     def test_probabilities(self):
@@ -28,6 +28,21 @@ class TreeTests(unittest.TestCase):
 
     def test_shape(self):
         with self.assertRaises(ValueError): self.model().predict([[1,2]])
+
+    def test_classifier_labels(self):
+        np.testing.assert_array_equal(self.model().predict([[0],[1],[np.nan]]),[0,1,0])
+
+    def test_tied_probability_uses_first_class(self):
+        model=self.model(); model.baseline=2.
+        np.testing.assert_array_equal(model.predict([[0]]),[0])
+
+    def test_regression_values_unchanged(self):
+        model=self.model(); model.classes_=np.array([])
+        np.testing.assert_array_equal(model.predict([[0],[1],[np.nan]]),[-1,4,-1])
+        with self.assertRaises(ValueError): model.predict_proba([[0]])
+
+    def test_empty_labels(self):
+        self.assertEqual(self.model().predict(np.empty((0,1))).shape,(0,))
 
 
 if __name__=='__main__': unittest.main()
